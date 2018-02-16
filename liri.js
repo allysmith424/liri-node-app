@@ -3,6 +3,7 @@ var Spotify = require("node-spotify-api");
 var Twitter = require("twitter");
 var request = require("request");
 var keys = require("./keys.js");
+var fs	= require("fs");
 
 var spotify = new Spotify(keys.spotify);
 var client = new Twitter(keys.twitter);
@@ -10,6 +11,7 @@ var client = new Twitter(keys.twitter);
 var commandLine;
 var commandAPI;
 var commandArgs = "";
+
 
 function parseCommandLine() {
 
@@ -25,28 +27,27 @@ function parseCommandLine() {
 
 	commandArgs = commandArgs.substr(1);
 
-}
+};
 
+function twitterSearch() {
 
-if (process.argv[2] === "my-tweets") {
+	client.get('statuses/user_timeline', function(error, tweets, response) {
+	
+	if(error) throw error;
 
-	// var params = {screen_name: 'nodejs'};
-	// client.get('statuses/user_timeline', params, function(error, tweets, response) {
-	//   if (!error) {
-	//     console.log(tweets);
-	//   }
-	// });
+	for (var i = 0; i < 20; i++) {
 
-	client.get('search/tweets', {q: 'node.js'}, function(error, tweets, response) {
-	   console.log(tweets);
+		console.log(tweets[i].created_at);
+		console.log(tweets[i].text);
+
+	}
+
 	});
 
-}
+};
 
-if (process.argv[2] === "spotify-this-song") {
+function spotifySearch() {
 
-	parseCommandLine();
-	 
 	spotify.search({ type: "track", query: commandArgs }, function(err, data) {
 	  if (err) {
 	    return console.log("Error occurred: " + err);
@@ -66,11 +67,9 @@ if (process.argv[2] === "spotify-this-song") {
 
 	});
 
-}
+};
 
-if (process.argv[2] === "movie-this") {
-
-	parseCommandLine();
+function movieSearch() {
 
 	request("http://www.omdbapi.com/?t=" + commandArgs + "&y=&plot=short&apikey=trilogy", function(error, response, body) {
 
@@ -82,11 +81,50 @@ if (process.argv[2] === "movie-this") {
 
 	});
 
+};
+
+function logSearch() {
+
+	fs.appendFile("log.txt", "\n" + commandAPI + " " +  commandArgs, function(error) {
+
+		if (error) {
+			
+			console.log("Error logging search: " + error);
+		
+		}
+
+	})
+
 }
 
-else if (process.argv[2] === "do-what-it-says") {
+// --------------------------------------------
+// --------------------------------------------
+// --------------------------------------------
 
-	parseCommandLine();
+parseCommandLine();
+
+logSearch();
+
+
+if (commandAPI === "my-tweets") {
+
+	twitterSearch();
+
+}
+
+if (commandAPI === "spotify-this-song") {
+
+	spotifySearch();
+
+}
+
+if (commandAPI === "movie-this") {
+
+	movieSearch();
+
+}
+
+else if (commandAPI === "do-what-it-says") {
 
 	fs.readFile("random.txt", "utf8", function(error, result) {
 
@@ -98,32 +136,10 @@ else if (process.argv[2] === "do-what-it-says") {
 
 		else {
 
-			var spotify = new Spotify({
-			  id: keys.spotify.id,
-			  secret: keys.spotify.secret
-			});
-			 
-			spotify.search({ type: "track", query: commandArgs }, function(err, data) {
-			  if (err) {
-			    return console.log("Error occurred: " + err);
-			  }
+			spotifySearch();
 
-			console.log("\n ------------\n");
+		}
 
-			console.log(JSON.stringify(data.tracks.items[0].album.artists[0].name, null, 2));
-
-			console.log(JSON.stringify(data.tracks.items[0].name, null, 2));
-
-			console.log(JSON.stringify(data.tracks.items[0].album.external_urls.spotify, null, 2));
-
-			console.log(JSON.stringify(data.tracks.items[0].album.name, null, 2));
-
-			console.log("\n ------------\n");
-
-			});
-			console.log("\n ------------\n");
-
-				}
 
 	})
 
