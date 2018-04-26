@@ -107,3 +107,16 @@ spotify-this-song hello
 spotify-this-song hello
 spotify-this-song Life+on+Mars
 movie-this Sing+Street
+undefined 
+my-tweets 
+spotify-this-song Thriller
+movie-this The+Little+Rascals
+do-what-it-says 
+do-what-it-says 
+do-what-it-says 
+undefined 
+spotify-this-song I want it that way
+movie The+Matrix
+undefined 
+spotify-this-song Ain't no mountain high enough
+movie-this Pulp+Fiction
